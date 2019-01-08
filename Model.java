@@ -24,7 +24,6 @@ public class Model {
         splitImageIntoRectangles();
         createFirstLayerWeightsMatrix();
         createSecondLayerWeightsMatrix();
-        System.out.println(W.getMatrix()[1][2]);
         learn();
         restoreImage();
     }
@@ -58,11 +57,13 @@ public class Model {
                 Rectangle rectangle = new Rectangle(x, y);
                 for (int i = x; i < x + rectangleWidth; i++) {
                     for (int j = y; j < y + rectangleHeight; j++) {
-                        if (i < image.getWidth()) {
-                            if (j < image.getHeight()) {
-                                Color color = new Color(image.getRGB(i, j));
-                                rectangle.addPixel(color);
-                            }
+                        if (i < image.getWidth() && j < image.getHeight()) {
+                            Color color = new Color(image.getRGB(i, j));
+                            rectangle.addPixel(color);
+                        } else {
+                            rectangle.add(-1);
+                            rectangle.add(-1);
+                            rectangle.add(-1);
                         }
                     }
                 }
@@ -106,6 +107,10 @@ public class Model {
             iteration++;
             System.out.println("Iteration = " + iteration + "; Error = " + E);
         }
+        System.out.println("First layer weights: \n ");
+        W.print();
+        System.out.println("Second layer weights: \n ");
+        W_.print();
     }
 
 
@@ -130,6 +135,26 @@ public class Model {
     }
 
     private void normaliseWeights() {
+        for (int i = 0; i < W.getMatrix().length; i++) {
+            double value = 0;
+            for (int j = 0; j < W.getMatrix()[0].length; j++) {
+                value += W.getMatrix()[i][j] * W.getMatrix()[i][j];
+            }
+            value = Math.sqrt(value);
+            for (int j = 0; j < W.getMatrix()[0].length; j++) {
+                W.getMatrix()[i][j] = W.getMatrix()[i][j] / value;
+            }
+        }
+        for (int i = 0; i < W_.getMatrix().length; i++) {
+            double value = 0;
+            for (int j = 0; j < W_.getMatrix()[0].length; j++) {
+                value += W_.getMatrix()[i][j] * W_.getMatrix()[i][j];
+            }
+            value = Math.sqrt(value);
+            for (int j = 0; j < W_.getMatrix()[0].length; j++) {
+                W_.getMatrix()[i][j] = W_.getMatrix()[i][j] / value;
+            }
+        }
     }
 
     private double calculateError() {

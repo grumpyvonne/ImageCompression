@@ -30,6 +30,10 @@ public class Rectangle {
         this.pixels.add(getNewColorValue(color.getBlue()));
     }
 
+    public void add(double value){
+        pixels.add(value);
+    }
+
     private double getNewColorValue(double color) {
         return 2 * color / 255 - 1;
     }

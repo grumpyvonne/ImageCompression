@@ -85,4 +85,11 @@ public class Matrix {
     public double[][] getMatrix() {
         return matrix;
     }
+
+    public int getRows(){
+        return rows;
+    }
+    public int getColumns(){
+        return columns;
+    }
 }
