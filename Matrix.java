@@ -3,11 +3,6 @@ public class Matrix {
     private int columns;
     private double[][] matrix;
 
-    public Matrix(int rows, int columns) {
-        this.rows = rows;
-        this.columns = columns;
-        matrix = new double[rows][columns];
-    }
 
     public Matrix(double[][] matrix) {
         rows = matrix.length;

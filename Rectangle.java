@@ -14,13 +14,6 @@ public class Rectangle {
         this.y = y;
     }
 
-    //    public Matrix createVectorX0() {
-//        double newMatrix[][] = new double[1][pixels.size()];
-//        for (int i = 0; i < pixels.size(); i++) {
-//            newMatrix[0][i] = pixels.get(i);
-//        }
-//        return new Matrix(newMatrix);
-//    }
 
     public void createVectorX0() {
         double vector[][] = new double[1][pixels.size()];
@@ -30,20 +23,15 @@ public class Rectangle {
         this.vectorX0 = new Matrix(vector);
     }
 
-    public void addElement(double element) {
-        pixels.add(element);
-    }
 
     public void addPixel(Color color) {
-        double red = color.getRed();
-        double blue = color.getBlue();
-        double green = color.getGreen();
-        double pixelColorValueRed = 2 * red / 255 - 1;
-        double pixelColorValueBlue = 2 * blue / 255 - 1;
-        double pixelColorValueGreen = 2 * green / 255 - 1;
-        this.pixels.add(pixelColorValueRed);
-        this.pixels.add(pixelColorValueBlue);
-        this.pixels.add(pixelColorValueGreen);
+        this.pixels.add(getNewColorValue(color.getRed()));
+        this.pixels.add(getNewColorValue(color.getGreen()));
+        this.pixels.add(getNewColorValue(color.getBlue()));
+    }
+
+    private double getNewColorValue(double color) {
+        return 2 * color / 255 - 1;
     }
 
     public int getX() {
@@ -54,7 +42,7 @@ public class Rectangle {
         return y;
     }
 
-    public Matrix getVectorX0(){
+    public Matrix getVectorX0() {
         return vectorX0;
     }
 }

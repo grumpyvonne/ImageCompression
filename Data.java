@@ -27,7 +27,7 @@ public class Data {
 
     private void inputImage() {
         JFrame frame = new JFrame();
-        JFileChooser chosenFile = new JFileChooser("D:\1");
+        JFileChooser chosenFile = new JFileChooser("images");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("*.png", new String[]{"png"});
         chosenFile.setFileFilter(filter);
         int ret = chosenFile.showOpenDialog(frame);

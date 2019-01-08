@@ -11,6 +11,8 @@ public class Model {
     private BufferedImage image;
     private BufferedImage restoredImage;
     private List<Rectangle> rectangles;
+    private double learningRate;
+    private double learningRate_;
     private Matrix W;
     private Matrix W_;
     private Matrix X;
@@ -61,11 +63,6 @@ public class Model {
                                 Color color = new Color(image.getRGB(i, j));
                                 rectangle.addPixel(color);
                             }
-//                            else {
-//                                rectangle.addElement(-1);
-//                                rectangle.addElement(-1);
-//                                rectangle.addElement(-1);
-//                            }
                         }
                     }
                 }
@@ -98,47 +95,35 @@ public class Model {
         while (E > error) {
             E = 0;
             for (Rectangle pattern : rectangles) {
-                double learningRate = 0.05;
-                double learningRate_ = 0.05;
                 X = pattern.getVectorX0();
                 Y = X.multiply(W);
                 X_ = Y.multiply(W_);
                 deltaX = X_.subtract(X);
-//                adaptLearningRate();
-                learningRate = adaptLearningRate(X);
-                learningRate_ = adaptLearningRate(Y);
-                correctWeights(learningRate, learningRate_);
+                adaptLearningRate();
+                correctWeights();
                 E += calculateError();
             }
             iteration++;
             System.out.println("Iteration = " + iteration + "; Error = " + E);
         }
     }
-    private double adaptLearningRate(Matrix X) {
-        double someValueX = 0;
+
+
+    private void adaptLearningRate() {
+        double someValueX = 1000;
         for (int i = 0; i < X.getMatrix()[0].length; i++) {
             someValueX += X.getMatrix()[0][i] * X.transpose().getMatrix()[i][0];
         }
-        double learningRate = 1 / someValueX;
-        return learningRate;
+        learningRate = 1 / someValueX;
+
+        double someValueY = 1000;
+        for (int i = 0; i < Y.getMatrix()[0].length; i++) {
+            someValueY += Y.getMatrix()[0][i] * Y.transpose().getMatrix()[i][0];
+        }
+        learningRate_ = 1 / someValueY;
     }
 
-
-//    private void adaptLearningRate() {
-//        double someValueX = 0;
-//        for (int i = 0; i < X.getMatrix()[0].length; i++) {
-//            someValueX += X.getMatrix()[0][i] * X.transpose().getMatrix()[i][0];
-//        }
-//        learningRate = 1 / someValueX;
-//
-//        double someValueY = 0;
-//        for (int i = 0; i < Y.getMatrix()[0].length; i++) {
-//            someValueY += Y.getMatrix()[0][i] * Y.transpose().getMatrix()[i][0];
-//        }
-//        learningRate = 1 / someValueY;
-//    }
-
-    private void correctWeights(double learningRate, double learningRate_) {
+    private void correctWeights() {
         W = W.subtract(X.transpose().multiply(learningRate).multiply(deltaX).multiply(W_.transpose()));
         W_ = W_.subtract(Y.transpose().multiply(learningRate_).multiply(deltaX));
         normaliseWeights();
@@ -177,9 +162,9 @@ public class Model {
             for (int i = 0; i < rectangleWidth; i++) {
                 for (int j = 0; j < rectangleHeight; j++) {
                     int red = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
-                    int blue = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
                     int green = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
-                    Color color = new Color(red, blue, green);
+                    int blue = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
+                    Color color = new Color(red, green, blue);
                     if (x + i < image.getWidth()) {
                         if (y + j < image.getHeight()) {
                             restoredImage.setRGB(x + i, y + j, color.getRGB());
