@@ -54,30 +54,21 @@ public class Matrix {
         return result;
     }
 
-    public Matrix multiply(Matrix secondMatrix){
-        if(columns != secondMatrix.rows){
+    public Matrix multiply(Matrix secondMatrix) {
+        if(secondMatrix.rows != columns){
             throw new IllegalArgumentException("Wrong size of columns and rows.");
         }
         double[][] resultMatrix = new double[rows][secondMatrix.columns];
-        for(int row1 = 0; row1 < rows; row1++){
-            for(int column2 = 0; column2 < secondMatrix.columns; column2++){
-                for(int column1 = 0; column1 < columns; column1++){
-                    resultMatrix[row1][column2] += matrix[row1][column1]*secondMatrix.matrix[column1][column2];
+        for (int row1 = 0; row1 < rows; row1++) {
+            for (int column2 = 0; column2 < secondMatrix.columns; column2++) {
+                for (int column1 = 0; column1 < columns; column1++) {
+                    resultMatrix[row1][column2] += matrix[row1][column1] * secondMatrix.matrix[column1][column2];
                 }
             }
         }
         Matrix result = new Matrix(resultMatrix);
         return result;
     }
-
-//    public Matrix normalize(){
-//        for(int column = 0; column < columns; column++){
-//            double sum = 0;
-//            for(int row = 0; row < rows; row++){
-//
-//            }
-//        }
-//    }
 
     public void print() {
         for (int row = 0; row < rows; row++) {

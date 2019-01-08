@@ -1,7 +1,7 @@
 public class Main {
     public static void main(String arg[]) {
-        InputData data = new InputData();
-        data.printParameters();
+        Data data = new Data();
+//        data.printParameters();
 //        double m1[][]={
 //            {1, 2},
 //            {3, 4}

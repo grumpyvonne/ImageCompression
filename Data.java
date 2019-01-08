@@ -6,25 +6,28 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class InputData {
+public class Data {
     private int height;
     private int width;
     private int p;
     private double error;
     private int L;
     BufferedImage image;
+    BufferedImage restoredImage;
     Model model;
 
-    public InputData() {
+    public Data() {
         inputImage();
         inputParameters();
         setParametersToModel();
         model.start();
+        saveImage();
+        printParameters();
     }
 
     private void inputImage() {
         JFrame frame = new JFrame();
-        JFileChooser chosenFile = new JFileChooser();
+        JFileChooser chosenFile = new JFileChooser("D:\1");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("*.png", new String[]{"png"});
         chosenFile.setFileFilter(filter);
         int ret = chosenFile.showOpenDialog(frame);
@@ -69,6 +72,17 @@ public class InputData {
         model.setP(p);
         model.setRectangleHeight(height);
         model.setRectangleWidth(width);
+    }
+
+    private void saveImage(){
+        restoredImage = model.getRestoredImage();
+        File file = new File("images/output.png");
+        try{
+            ImageIO.write(restoredImage,"png", file);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        System.out.println("Image saved.");
     }
 
 }

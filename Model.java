@@ -9,15 +9,22 @@ public class Model {
     private double error;
     private int p;
     private BufferedImage image;
+    private BufferedImage restoredImage;
     private List<Rectangle> rectangles;
     private Matrix W;
     private Matrix W_;
+    private Matrix X;
+    private Matrix X_;
+    private Matrix Y;
+    private Matrix deltaX;
 
     public void start() {
         splitImageIntoRectangles();
         createFirstLayerWeightsMatrix();
         createSecondLayerWeightsMatrix();
         System.out.println(W.getMatrix()[1][2]);
+        learn();
+        restoreImage();
     }
 
     public void setRectangleWidth(int width) {
@@ -80,12 +87,111 @@ public class Model {
         }
         W = new Matrix(randomWeights);
     }
-    private void createSecondLayerWeightsMatrix(){
+
+    private void createSecondLayerWeightsMatrix() {
         W_ = W.transpose();
     }
 
-    private void learn(){
+    private void learn() {
+        int iteration = 0;
+        double E = Double.MAX_VALUE;
+        while (E > error) {
+            E = 0;
+            for (Rectangle pattern : rectangles) {
+                double learningRate = 0.05;
+                double learningRate_ = 0.05;
+                X = pattern.getVectorX0();
+                Y = X.multiply(W);
+                X_ = Y.multiply(W_);
+                deltaX = X_.subtract(X);
+//                adaptLearningRate();
+                learningRate = adaptLearningRate(X);
+                learningRate_ = adaptLearningRate(Y);
+                correctWeights(learningRate, learningRate_);
+                E += calculateError();
+            }
+            iteration++;
+            System.out.println("Iteration = " + iteration + "; Error = " + E);
+        }
+    }
+    private double adaptLearningRate(Matrix X) {
+        double someValueX = 0;
+        for (int i = 0; i < X.getMatrix()[0].length; i++) {
+            someValueX += X.getMatrix()[0][i] * X.transpose().getMatrix()[i][0];
+        }
+        double learningRate = 1 / someValueX;
+        return learningRate;
+    }
 
+
+//    private void adaptLearningRate() {
+//        double someValueX = 0;
+//        for (int i = 0; i < X.getMatrix()[0].length; i++) {
+//            someValueX += X.getMatrix()[0][i] * X.transpose().getMatrix()[i][0];
+//        }
+//        learningRate = 1 / someValueX;
+//
+//        double someValueY = 0;
+//        for (int i = 0; i < Y.getMatrix()[0].length; i++) {
+//            someValueY += Y.getMatrix()[0][i] * Y.transpose().getMatrix()[i][0];
+//        }
+//        learningRate = 1 / someValueY;
+//    }
+
+    private void correctWeights(double learningRate, double learningRate_) {
+        W = W.subtract(X.transpose().multiply(learningRate).multiply(deltaX).multiply(W_.transpose()));
+        W_ = W_.subtract(Y.transpose().multiply(learningRate_).multiply(deltaX));
+        normaliseWeights();
+    }
+
+    private void normaliseWeights() {
+    }
+
+    private double calculateError() {
+        double e = 0;
+        for (int i = 0; i < X.getMatrix()[0].length; i++) {
+            e += deltaX.getMatrix()[0][i] * deltaX.getMatrix()[0][i];
+        }
+        return e;
+    }
+
+    private double restorePixel(double RGB) {
+        double value = 255 * (RGB + 1) / 2;
+        if (value < 0) {
+            value = 0;
+        } else if (value > 255) {
+            value = 255;
+        }
+        return value;
+    }
+
+    private void restoreImage() {
+        restoredImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        for (Rectangle rectangle : rectangles) {
+            X = rectangle.getVectorX0();
+            Y = X.multiply(W);
+            X_ = Y.multiply(W_);
+            int x = rectangle.getX();
+            int y = rectangle.getY();
+            int pixelPosition = 0;
+            for (int i = 0; i < rectangleWidth; i++) {
+                for (int j = 0; j < rectangleHeight; j++) {
+                    int red = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
+                    int blue = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
+                    int green = (int) restorePixel(X_.getMatrix()[0][pixelPosition++]);
+                    Color color = new Color(red, blue, green);
+                    if (x + i < image.getWidth()) {
+                        if (y + j < image.getHeight()) {
+                            restoredImage.setRGB(x + i, y + j, color.getRGB());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public BufferedImage getRestoredImage() {
+        return restoredImage;
     }
 
     public int getNumOfRectangles() {
